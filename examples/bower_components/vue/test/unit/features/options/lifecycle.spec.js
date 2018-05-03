@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-describe('Options lifecycle hooks', () => {
+describe('Options lifecyce hooks', () => {
   let spy
   beforeEach(() => {
     spy = jasmine.createSpy('hook')
@@ -93,7 +93,7 @@ describe('Options lifecycle hooks', () => {
     it('should mount child parent in correct order', () => {
       const calls = []
       new Vue({
-        template: '<div><test></test></div>',
+        template: '<div><test></test><div>',
         mounted () {
           calls.push('parent')
         },

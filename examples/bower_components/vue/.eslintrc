@@ -1,13 +1,14 @@
 {
   "root": true,
-  "plugins": [
-    "flowtype"
-  ],
-  "extends": [
-    "plugin:vue-libs/recommended",
-    "plugin:flowtype/recommended"
-  ],
+  "parser": "babel-eslint",
+  "extends": "vue",
+  "plugins": ["flowtype"],
   "globals": {
     "__WEEX__": true
+  },
+  "rules": {
+    "no-useless-escape": 0,
+    "flowtype/define-flow-type": 1,
+    "flowtype/use-flow-type": 1
   }
 }

@@ -106,21 +106,4 @@ describe('Options data', () => {
     })
     expect(vm.a).toBe(1)
   })
-
-  it('should called with this', () => {
-    const vm = new Vue({
-      template: '<div><child></child></div>',
-      provide: { foo: 1 },
-      components: {
-        child: {
-          template: '<span>{{bar}}</span>',
-          inject: ['foo'],
-          data ({ foo }) {
-            return { bar: 'foo:' + foo }
-          }
-        }
-      }
-    }).$mount()
-    expect(vm.$el.innerHTML).toBe('<span>foo:1</span>')
-  })
 })

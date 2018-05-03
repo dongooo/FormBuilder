@@ -27,8 +27,8 @@ export interface VNode {
 
 export interface VNodeComponentOptions {
   Ctor: typeof Vue;
-  propsData?: object;
-  listeners?: object;
+  propsData?: Object;
+  listeners?: Object;
   children?: VNodeChildren;
   tag?: string;
 }
@@ -42,14 +42,14 @@ export interface VNodeData {
   staticClass?: string;
   class?: any;
   staticStyle?: { [key: string]: any };
-  style?: object[] | object;
+  style?: Object[] | Object;
   props?: { [key: string]: any };
   attrs?: { [key: string]: any };
   domProps?: { [key: string]: any };
   hook?: { [key: string]: Function };
   on?: { [key: string]: Function | Function[] };
   nativeOn?: { [key: string]: Function | Function[] };
-  transition?: object;
+  transition?: Object;
   show?: boolean;
   inlineTemplate?: {
     render: Function;

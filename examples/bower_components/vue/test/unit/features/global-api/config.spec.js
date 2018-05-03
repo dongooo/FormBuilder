@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import { warn } from 'core/util/debug'
 
 describe('Global config', () => {
   it('should warn replacing config object', () => {
@@ -11,15 +10,48 @@ describe('Global config', () => {
 
   describe('silent', () => {
     it('should be false by default', () => {
-      warn('foo')
+      Vue.util.warn('foo')
       expect('foo').toHaveBeenWarned()
     })
 
     it('should work when set to true', () => {
       Vue.config.silent = true
-      warn('foo')
+      Vue.util.warn('foo')
       expect('foo').not.toHaveBeenWarned()
       Vue.config.silent = false
+    })
+  })
+
+  describe('errorHandler', () => {
+    it('should be called with correct args', () => {
+      const spy = jasmine.createSpy('errorHandler')
+      Vue.config.errorHandler = spy
+      const err = new Error()
+      const vm = new Vue({
+        render () { throw err }
+      }).$mount()
+      expect(spy).toHaveBeenCalledWith(err, vm)
+      Vue.config.errorHandler = null
+    })
+
+    it('should capture user watcher callback errors', done => {
+      const spy = jasmine.createSpy('errorHandler')
+      Vue.config.errorHandler = spy
+      const err = new Error()
+      const vm = new Vue({
+        render () {},
+        data: { a: 1 },
+        watch: {
+          a: () => {
+            throw err
+          }
+        }
+      }).$mount()
+      vm.a = 2
+      waitForUpdate(() => {
+        expect(spy).toHaveBeenCalledWith(err, vm)
+        Vue.config.errorHandler = null
+      }).then(done)
     })
   })
 
@@ -42,17 +74,6 @@ describe('Global config', () => {
       expect(spy.calls.count()).toBe(2)
       expect(spy).toHaveBeenCalledWith(2, 2, test)
       expect(test.$options.__test__).toBe(3)
-    })
-  })
-
-  describe('ignoredElements', () => {
-    it('should work', () => {
-      Vue.config.ignoredElements = ['foo', /^ion-/]
-      new Vue({
-        template: `<div><foo/><ion-foo/><ion-bar/></div>`
-      }).$mount()
-      expect('Unknown custom element').not.toHaveBeenWarned()
-      Vue.config.ignoredElements = []
     })
   })
 })

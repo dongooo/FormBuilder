@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue from 'entries/web-runtime'
 
 describe('Options render', () => {
   it('basic usage', () => {

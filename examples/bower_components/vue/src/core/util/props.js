@@ -1,22 +1,15 @@
 /* @flow */
 
-import { warn } from './debug'
+import { hasOwn, isObject, isPlainObject, capitalize, hyphenate } from 'shared/util'
 import { observe, observerState } from '../observer/index'
-import {
-  hasOwn,
-  isObject,
-  toRawType,
-  hyphenate,
-  capitalize,
-  isPlainObject
-} from 'shared/util'
+import { warn } from './debug'
 
 type PropOptions = {
   type: Function | Array<Function> | null,
   default: any,
   required: ?boolean,
   validator: ?Function
-};
+}
 
 export function validateProp (
   key: string,
@@ -61,8 +54,8 @@ function getPropDefaultValue (vm: ?Component, prop: PropOptions, key: string): a
   }
   const def = prop.default
   // warn against non-factory defaults for Object & Array
-  if (process.env.NODE_ENV !== 'production' && isObject(def)) {
-    warn(
+  if (isObject(def)) {
+    process.env.NODE_ENV !== 'production' && warn(
       'Invalid default value for prop "' + key + '": ' +
       'Props with type Object/Array must use a factory function ' +
       'to return the default value.',
@@ -73,13 +66,11 @@ function getPropDefaultValue (vm: ?Component, prop: PropOptions, key: string): a
   // return previous default value to avoid unnecessary watcher trigger
   if (vm && vm.$options.propsData &&
     vm.$options.propsData[key] === undefined &&
-    vm._props[key] !== undefined
-  ) {
-    return vm._props[key]
+    vm[key] !== undefined) {
+    return vm[key]
   }
   // call factory function for non-Function types
-  // a value is Function if its prototype is function even across different execution context
-  return typeof def === 'function' && getType(prop.type) !== 'Function'
+  return typeof def === 'function' && prop.type !== Function
     ? def.call(vm)
     : def
 }
@@ -119,9 +110,9 @@ function assertProp (
   }
   if (!valid) {
     warn(
-      `Invalid prop: type check failed for prop "${name}".` +
-      ` Expected ${expectedTypes.map(capitalize).join(', ')}` +
-      `, got ${toRawType(value)}.`,
+      'Invalid prop: type check failed for prop "' + name + '".' +
+      ' Expected ' + expectedTypes.map(capitalize).join(', ') +
+      ', got ' + Object.prototype.toString.call(value).slice(8, -1) + '.',
       vm
     )
     return
@@ -137,21 +128,23 @@ function assertProp (
   }
 }
 
-const simpleCheckRE = /^(String|Number|Boolean|Function|Symbol)$/
-
+/**
+ * Assert the type of a value
+ */
 function assertType (value: any, type: Function): {
-  valid: boolean;
-  expectedType: string;
+  valid: boolean,
+  expectedType: ?string
 } {
   let valid
-  const expectedType = getType(type)
-  if (simpleCheckRE.test(expectedType)) {
-    const t = typeof value
-    valid = t === expectedType.toLowerCase()
-    // for primitive wrapper objects
-    if (!valid && t === 'object') {
-      valid = value instanceof type
-    }
+  let expectedType = getType(type)
+  if (expectedType === 'String') {
+    valid = typeof value === (expectedType = 'string')
+  } else if (expectedType === 'Number') {
+    valid = typeof value === (expectedType = 'number')
+  } else if (expectedType === 'Boolean') {
+    valid = typeof value === (expectedType = 'boolean')
+  } else if (expectedType === 'Function') {
+    valid = typeof value === (expectedType = 'function')
   } else if (expectedType === 'Object') {
     valid = isPlainObject(value)
   } else if (expectedType === 'Array') {
@@ -172,7 +165,7 @@ function assertType (value: any, type: Function): {
  */
 function getType (fn) {
   const match = fn && fn.toString().match(/^\s*function (\w+)/)
-  return match ? match[1] : ''
+  return match && match[1]
 }
 
 function isType (type, fn) {

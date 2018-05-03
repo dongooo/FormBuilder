@@ -1,23 +1,23 @@
 /* @flow */
 
-import { isDef, isObject } from 'shared/util'
+import { isObject } from 'shared/util'
 
 export function genClassForVnode (vnode: VNode): string {
   let data = vnode.data
   let parentNode = vnode
   let childNode = vnode
-  while (isDef(childNode.componentInstance)) {
+  while (childNode.componentInstance) {
     childNode = childNode.componentInstance._vnode
     if (childNode.data) {
       data = mergeClassData(childNode.data, data)
     }
   }
-  while (isDef(parentNode = parentNode.parent)) {
+  while ((parentNode = parentNode.parent)) {
     if (parentNode.data) {
       data = mergeClassData(data, parentNode.data)
     }
   }
-  return renderClass(data.staticClass, data.class)
+  return genClassFromData(data)
 }
 
 function mergeClassData (child: VNodeData, parent: VNodeData): {
@@ -26,17 +26,16 @@ function mergeClassData (child: VNodeData, parent: VNodeData): {
 } {
   return {
     staticClass: concat(child.staticClass, parent.staticClass),
-    class: isDef(child.class)
+    class: child.class
       ? [child.class, parent.class]
       : parent.class
   }
 }
 
-export function renderClass (
-  staticClass: ?string,
-  dynamicClass: any
-): string {
-  if (isDef(staticClass) || isDef(dynamicClass)) {
+function genClassFromData (data: Object): string {
+  const dynamicClass = data.class
+  const staticClass = data.staticClass
+  if (staticClass || dynamicClass) {
     return concat(staticClass, stringifyClass(dynamicClass))
   }
   /* istanbul ignore next */
@@ -48,38 +47,30 @@ export function concat (a: ?string, b: ?string): string {
 }
 
 export function stringifyClass (value: any): string {
-  if (Array.isArray(value)) {
-    return stringifyArray(value)
-  }
-  if (isObject(value)) {
-    return stringifyObject(value)
+  let res = ''
+  if (!value) {
+    return res
   }
   if (typeof value === 'string') {
     return value
   }
+  if (Array.isArray(value)) {
+    let stringified
+    for (let i = 0, l = value.length; i < l; i++) {
+      if (value[i]) {
+        if ((stringified = stringifyClass(value[i]))) {
+          res += stringified + ' '
+        }
+      }
+    }
+    return res.slice(0, -1)
+  }
+  if (isObject(value)) {
+    for (const key in value) {
+      if (value[key]) res += key + ' '
+    }
+    return res.slice(0, -1)
+  }
   /* istanbul ignore next */
-  return ''
-}
-
-function stringifyArray (value: Array<any>): string {
-  let res = ''
-  let stringified
-  for (let i = 0, l = value.length; i < l; i++) {
-    if (isDef(stringified = stringifyClass(value[i])) && stringified !== '') {
-      if (res) res += ' '
-      res += stringified
-    }
-  }
-  return res
-}
-
-function stringifyObject (value: Object): string {
-  let res = ''
-  for (const key in value) {
-    if (value[key]) {
-      if (res) res += ' '
-      res += key
-    }
-  }
   return res
 }

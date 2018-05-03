@@ -138,14 +138,14 @@ module.exports = function(options) {
   };
 
   var packagePlatformJson = {
-    name: "survey-" + options.platform,
+    name: "formbuild-" + options.platform,
     version: packageJson.version,
     description:
-      "survey.js is a JavaScript Survey Library. It is a modern way to add a survey to your website. It uses JSON for survey metadata and results.",
-    keywords: ["Survey", "JavaScript", "Bootstrap", "Library"].concat(
+      "generate form with config",
+    keywords: ["formbuild", "JavaScript", "Bootstrap", "Library"].concat(
       platformOptions[options.platform].keywords
     ),
-    homepage: "https://surveyjs.io/",
+    homepage: "https://github.com/dongooo/FormBuilder.git",
     license: "MIT",
     files: [
       "survey.css",
@@ -153,12 +153,12 @@ module.exports = function(options) {
       "survey." + options.platformPrefix + ".js",
       "survey." + options.platformPrefix + ".min.js"
     ],
-    main: "survey." + options.platformPrefix + ".js",
+    main: "formbuild." + options.platformPrefix + ".js",
     repository: {
       type: "git",
-      url: "https://github.com/surveyjs/surveyjs.git"
+      url: "https://github.com/dongooo/FormBuilder.git"
     },
-    typings: "survey." + options.platformPrefix + ".d.ts"
+    typings: "formbuild." + options.platformPrefix + ".d.ts"
   };
 
   if (!!platformOptions[options.platform].dependencies) {

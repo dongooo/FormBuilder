@@ -1,10 +1,9 @@
 /* @flow */
 
-import { emptyObject } from 'shared/util'
 import { parseFilters } from './parser/filter-parser'
 
 export function baseWarn (msg: string) {
-  console.error(`[Vue compiler]: ${msg}`)
+  console.error(`[Vue parser]: ${msg}`)
 }
 
 export function pluckModuleFunction<F: Function> (
@@ -40,62 +39,25 @@ export function addHandler (
   name: string,
   value: string,
   modifiers: ?ASTModifiers,
-  important?: boolean,
-  warn?: Function
+  important: ?boolean
 ) {
-  modifiers = modifiers || emptyObject
-  // warn prevent and passive modifier
-  /* istanbul ignore if */
-  if (
-    process.env.NODE_ENV !== 'production' && warn &&
-    modifiers.prevent && modifiers.passive
-  ) {
-    warn(
-      'passive and prevent can\'t be used together. ' +
-      'Passive handler can\'t prevent default event.'
-    )
-  }
-
   // check capture modifier
-  if (modifiers.capture) {
+  if (modifiers && modifiers.capture) {
     delete modifiers.capture
     name = '!' + name // mark the event as captured
   }
-  if (modifiers.once) {
+  if (modifiers && modifiers.once) {
     delete modifiers.once
     name = '~' + name // mark the event as once
   }
-  /* istanbul ignore if */
-  if (modifiers.passive) {
-    delete modifiers.passive
-    name = '&' + name // mark the event as passive
-  }
-
-  // normalize click.right and click.middle since they don't actually fire
-  // this is technically browser-specific, but at least for now browsers are
-  // the only target envs that have right/middle clicks.
-  if (name === 'click') {
-    if (modifiers.right) {
-      name = 'contextmenu'
-      delete modifiers.right
-    } else if (modifiers.middle) {
-      name = 'mouseup'
-    }
-  }
-
   let events
-  if (modifiers.native) {
+  if (modifiers && modifiers.native) {
     delete modifiers.native
     events = el.nativeEvents || (el.nativeEvents = {})
   } else {
     events = el.events || (el.events = {})
   }
-
-  const newHandler: any = { value }
-  if (modifiers !== emptyObject) {
-    newHandler.modifiers = modifiers
-  }
-
+  const newHandler = { value, modifiers }
   const handlers = events[name]
   /* istanbul ignore if */
   if (Array.isArray(handlers)) {
@@ -125,15 +87,7 @@ export function getBindingAttr (
   }
 }
 
-// note: this only removes the attr from the Array (attrsList) so that it
-// doesn't get processed by processAttrs.
-// By default it does NOT remove it from the map (attrsMap) because the map is
-// needed during codegen.
-export function getAndRemoveAttr (
-  el: ASTElement,
-  name: string,
-  removeFromMap?: boolean
-): ?string {
+export function getAndRemoveAttr (el: ASTElement, name: string): ?string {
   let val
   if ((val = el.attrsMap[name]) != null) {
     const list = el.attrsList
@@ -144,8 +98,89 @@ export function getAndRemoveAttr (
       }
     }
   }
-  if (removeFromMap) {
-    delete el.attrsMap[name]
-  }
   return val
+}
+
+let len, str, chr, index, expressionPos, expressionEndPos
+
+/**
+ * parse directive model to do the array update transform. a[idx] = val => $$a.splice($$idx, 1, val)
+ *
+ * for loop possible cases:
+ *
+ * - test
+ * - test[idx]
+ * - test[test1[idx]]
+ * - test["a"][idx]
+ * - xxx.test[a[a].test1[idx]]
+ * - test.xxx.a["asa"][test1[idx]]
+ *
+ */
+
+export function parseModel (val: string): Object {
+  str = val
+  len = str.length
+  index = expressionPos = expressionEndPos = 0
+
+  if (val.indexOf('[') < 0 || val.lastIndexOf(']') < len - 1) {
+    return {
+      exp: val,
+      idx: null
+    }
+  }
+
+  while (!eof()) {
+    chr = next()
+    /* istanbul ignore if */
+    if (isStringStart(chr)) {
+      parseString(chr)
+    } else if (chr === 0x5B) {
+      parseBracket(chr)
+    }
+  }
+
+  return {
+    exp: val.substring(0, expressionPos),
+    idx: val.substring(expressionPos + 1, expressionEndPos)
+  }
+}
+
+function next (): number {
+  return str.charCodeAt(++index)
+}
+
+function eof (): boolean {
+  return index >= len
+}
+
+function isStringStart (chr: number): boolean {
+  return chr === 0x22 || chr === 0x27
+}
+
+function parseBracket (chr: number): void {
+  let inBracket = 1
+  expressionPos = index
+  while (!eof()) {
+    chr = next()
+    if (isStringStart(chr)) {
+      parseString(chr)
+      continue
+    }
+    if (chr === 0x5B) inBracket++
+    if (chr === 0x5D) inBracket--
+    if (inBracket === 0) {
+      expressionEndPos = index
+      break
+    }
+  }
+}
+
+function parseString (chr: number): void {
+  const stringQuote = chr
+  while (!eof()) {
+    chr = next()
+    if (chr === stringQuote) {
+      break
+    }
+  }
 }

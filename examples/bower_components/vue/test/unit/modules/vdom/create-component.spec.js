@@ -61,8 +61,7 @@ describe('create-component', () => {
     }
     function go () {
       vnode = createComponent(async, data, vm, vm)
-      expect(vnode.isComment).toBe(true) // not to be loaded yet.
-      expect(vnode.asyncFactory).toBe(async)
+      expect(vnode).toBeUndefined() // not to be loaded yet.
     }
     function loaded () {
       vnode = createComponent(async, data, vm, vm)
@@ -94,11 +93,11 @@ describe('create-component', () => {
     }
     function go () {
       vnode = createComponent(async, data, vm, vm)
-      expect(vnode.isComment).toBe(true) // not to be loaded yet.
+      expect(vnode).toBeUndefined() // not to be loaded yet.
     }
     function failed () {
       vnode = createComponent(async, data, vm, vm)
-      expect(vnode.isComment).toBe(true) // failed, still a comment node
+      expect(vnode).toBeUndefined() // failed
       expect(`Failed to resolve async component: ${async}\nReason: ${reason}`).toHaveBeenWarned()
       done()
     }

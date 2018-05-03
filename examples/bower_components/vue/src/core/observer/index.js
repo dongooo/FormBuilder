@@ -1,16 +1,14 @@
 /* @flow */
 
 import Dep from './dep'
-import VNode from '../vdom/vnode'
 import { arrayMethods } from './array'
 import {
   def,
-  warn,
-  hasOwn,
-  hasProto,
   isObject,
   isPlainObject,
-  isValidArrayIndex,
+  hasProto,
+  hasOwn,
+  warn,
   isServerRendering
 } from '../util/index'
 
@@ -23,7 +21,8 @@ const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
  * under a frozen data structure. Converting it would defeat the optimization.
  */
 export const observerState = {
-  shouldConvert: true
+  shouldConvert: true,
+  isSettingProps: false
 }
 
 /**
@@ -81,7 +80,7 @@ export class Observer {
  * Augment an target Object or Array by intercepting
  * the prototype chain using __proto__
  */
-function protoAugment (target, src: Object, keys: any) {
+function protoAugment (target, src: Object) {
   /* eslint-disable no-proto */
   target.__proto__ = src
   /* eslint-enable no-proto */
@@ -105,7 +104,7 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * or the existing observer if the value already has one.
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
-  if (!isObject(value) || value instanceof VNode) {
+  if (!isObject(value)) {
     return
   }
   let ob: Observer | void
@@ -133,8 +132,7 @@ export function defineReactive (
   obj: Object,
   key: string,
   val: any,
-  customSetter?: ?Function,
-  shallow?: boolean
+  customSetter?: Function
 ) {
   const dep = new Dep()
 
@@ -147,7 +145,7 @@ export function defineReactive (
   const getter = property && property.get
   const setter = property && property.set
 
-  let childOb = !shallow && observe(val)
+  let childOb = observe(val)
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
@@ -157,9 +155,9 @@ export function defineReactive (
         dep.depend()
         if (childOb) {
           childOb.dep.depend()
-          if (Array.isArray(value)) {
-            dependArray(value)
-          }
+        }
+        if (Array.isArray(value)) {
+          dependArray(value)
         }
       }
       return value
@@ -179,7 +177,7 @@ export function defineReactive (
       } else {
         val = newVal
       }
-      childOb = !shallow && observe(newVal)
+      childOb = observe(newVal)
       dep.notify()
     }
   })
@@ -190,27 +188,27 @@ export function defineReactive (
  * triggers change notification if the property doesn't
  * already exist.
  */
-export function set (target: Array<any> | Object, key: any, val: any): any {
-  if (Array.isArray(target) && isValidArrayIndex(key)) {
-    target.length = Math.max(target.length, key)
-    target.splice(key, 1, val)
+export function set (obj: Array<any> | Object, key: any, val: any) {
+  if (Array.isArray(obj)) {
+    obj.length = Math.max(obj.length, key)
+    obj.splice(key, 1, val)
     return val
   }
-  if (key in target && !(key in Object.prototype)) {
-    target[key] = val
-    return val
+  if (hasOwn(obj, key)) {
+    obj[key] = val
+    return
   }
-  const ob = (target: any).__ob__
-  if (target._isVue || (ob && ob.vmCount)) {
+  const ob = obj.__ob__
+  if (obj._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
       'at runtime - declare it upfront in the data option.'
     )
-    return val
+    return
   }
   if (!ob) {
-    target[key] = val
-    return val
+    obj[key] = val
+    return
   }
   defineReactive(ob.value, key, val)
   ob.dep.notify()
@@ -220,23 +218,19 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
 /**
  * Delete a property and trigger change if necessary.
  */
-export function del (target: Array<any> | Object, key: any) {
-  if (Array.isArray(target) && isValidArrayIndex(key)) {
-    target.splice(key, 1)
-    return
-  }
-  const ob = (target: any).__ob__
-  if (target._isVue || (ob && ob.vmCount)) {
+export function del (obj: Object, key: string) {
+  const ob = obj.__ob__
+  if (obj._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid deleting properties on a Vue instance or its root $data ' +
       '- just set it to null.'
     )
     return
   }
-  if (!hasOwn(target, key)) {
+  if (!hasOwn(obj, key)) {
     return
   }
-  delete target[key]
+  delete obj[key]
   if (!ob) {
     return
   }

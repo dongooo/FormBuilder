@@ -1,6 +1,6 @@
 {
   "presets": ["es2015", "flow-vue"],
-  "plugins": ["transform-vue-jsx", "syntax-dynamic-import"],
+  "plugins": ["transform-vue-jsx"],
   "ignore": [
     "dist/*.js",
     "packages/**/*.js"

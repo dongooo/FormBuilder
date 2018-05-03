@@ -1,4 +1,4 @@
-import { nextTick } from 'core/util/next-tick'
+import { nextTick } from 'core/util/env'
 
 describe('nextTick', () => {
   it('accepts a callback', done => {
