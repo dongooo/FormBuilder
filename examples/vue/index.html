@@ -14,6 +14,12 @@
     <link rel="stylesheet" href="../../packages/survey-vue/survey.css" />
     <script src="../../packages/survey-vue/survey.vue.js"></script>
 
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>-->
 
     <!-- Material Design fonts -->
@@ -31,8 +37,47 @@
 <body>
     <div id="surveyElement">
         <survey :survey='survey' />
+        <el-button type="success">成功按钮</el-button>
+        
     </div>
+    <div id="formBuilder">
+        <!-- <el-button type="success">success</el-button> -->
+        
+        <el-form>
+            <el-form-item label="公司名称">
+                <el-input></el-input>
+            </el-form-item>
+        </el-form>
+
+    </div>
+    
+   
     <script src="./index.js"></script>
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <script>
+        new Vue({
+            el:'#formBuilder',
+            data:{
+                listValue:[],
+                form:{},
+                input:''
+            },
+            created(){
+                this.getJson();
+            },
+            methods:{
+                getJson(){
+                    let url='./TravelExpenseRequest01.json';
+                    axios.get(url).then(response => {
+                        this.listValue = response.data.retData.listValue;
+                        console.log(this.listValue);
+                    })
+                }
+            }
+        })
+    </script>
 </body>
 
 </html>
