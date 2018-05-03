@@ -13,9 +13,9 @@
     "doc_update": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && ts-node doc_generator/lib_docupdater.ts",
     "lint": "tslint ./src/**/*.ts -t verbose"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "formbuilder",
-  "private": true,
+  "private": false,
   "devDependencies": {
     "@types/angular": "1.6.2",
     "@types/jquery": "2.0.39",
