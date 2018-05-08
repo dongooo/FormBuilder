@@ -96,9 +96,9 @@ module.exports = function(options) {
   //TODO
   options.platformPrefix =
     options.platform == "knockout" ? "ko" : options.platform;
-  var packagePath = "./packages/survey-" + options.platform + "/";
+  var packagePath = "./packages/formbuild-" + options.platform + "/";
   var extractCSS = new ExtractTextPlugin({
-    filename: packagePath + "survey.css"
+    filename: packagePath + "formbuild.css"
   });
 
   var percentage_handler = function handler(percentage, msg) {
@@ -107,7 +107,7 @@ module.exports = function(options) {
     } else if (1 === percentage) {
       if (options.buildType === "prod") {
         dts.bundle({
-          name: "../../survey." + options.platformPrefix,
+          name: "../../formbuild." + options.platformPrefix,
           main: packagePath + "typings/entries/" + options.platform + ".d.ts",
           outputAsModuleFolder: true,
           headerText: dts_banner
@@ -116,7 +116,7 @@ module.exports = function(options) {
         if (options.platform === "vue") {
           replace(
             {
-              files: packagePath + "survey." + options.platform + ".d.ts",
+              files: packagePath + "formbuild." + options.platform + ".d.ts",
               from: /export default\s+\w+;/g,
               to: ""
             },
@@ -148,10 +148,10 @@ module.exports = function(options) {
     homepage: "https://github.com/dongooo/FormBuilder.git",
     license: "MIT",
     files: [
-      "survey.css",
-      "survey." + options.platformPrefix + ".d.ts",
-      "survey." + options.platformPrefix + ".js",
-      "survey." + options.platformPrefix + ".min.js"
+      "formbuild.css",
+      "formbuild." + options.platformPrefix + ".d.ts",
+      "formbuild." + options.platformPrefix + ".js",
+      "formbuild." + options.platformPrefix + ".min.js"
     ],
     main: "formbuild." + options.platformPrefix + ".js",
     repository: {
@@ -239,7 +239,7 @@ module.exports = function(options) {
         "[name]" +
         (options.buildType === "prod" ? ".min" : "") +
         ".js",
-      library: "Survey",
+      library: "FormBuild",
       libraryTarget: "umd",
       umdNamedDefine: true
     },
@@ -278,7 +278,7 @@ module.exports = function(options) {
   }
 
   config.entry[
-    "survey." + (options.platform == "knockout" ? "ko" : options.platform)
+    "formbuild." + (options.platform == "knockout" ? "ko" : options.platform)
   ] = path.resolve(__dirname, "./src/entries/" + options.platform);
 
   return config;

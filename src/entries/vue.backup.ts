@@ -1,4 +1,3 @@
-import { baseCss } from './../defaultCss/basecss';
 // model
 export * from "./chunks/model";
 
@@ -8,9 +7,9 @@ import "./chunks/localization";
 // helpers
 export * from "./chunks/helpers";
 
-// export { surveyCss } from "../defaultCss/cssstandard";
+export { surveyCss } from "../defaultCss/cssstandard";
 // css standard
-export { baseCss } from "../defaultCss/basecss";
+export { defaultStandardCss } from "../defaultCss/cssstandard";
 // css bootstrap
 export { defaultBootstrapCss } from "../defaultCss/cssbootstrap";
 // css bootstrap + material
@@ -18,11 +17,11 @@ export {
   defaultBootstrapMaterialCss
 } from "../defaultCss/cssbootstrapmaterial";
 
-import { VueFormBuildModel } from "../vue/formBuildModel";
-export { VueFormBuildModel as Model };
-import { VueFormBuildWindowModel } from "../vue/formBuildModel";
-export { VueFormBuildWindowModel as WindowModel };
-export { FormBuild } from "../vue/formBuild.vue";
+import { VueSurveyModel } from "../vue/surveyModel";
+export { VueSurveyModel as Model };
+import { VueSurveyWindowModel } from "../vue/surveyModel";
+export { VueSurveyWindowModel as WindowModel };
+export { Survey } from "../vue/survey.vue";
 export { CustomWidget } from "../vue/customwidget.vue";
 export { SurveyString } from "../vue/string.vue";
 export { SurveyElementVue } from "../vue/element.vue";

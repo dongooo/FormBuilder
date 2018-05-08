@@ -1,3 +1,4 @@
+import { FormBuildModel } from './../../formBuild';
 // styles
 import "../../main.scss";
 
@@ -91,6 +92,7 @@ export {
 } from "../../question_paneldynamic";
 export { SurveyTimer } from "../../surveytimer";
 export { SurveyModel } from "../../survey";
+export { FormBuildModel } from "../../formBuild"
 export {
   SurveyTrigger,
   SurveyTriggerComplete,
@@ -99,6 +101,7 @@ export {
   Trigger
 } from "../../trigger";
 export { SurveyWindowModel } from "../../surveyWindow";
+export { FormBuildWindowModel } from "../../formBuildWindow";
 export { TextPreProcessor } from "../../textPreProcessor";
 
 export { dxSurveyService } from "../../dxSurveyService";
