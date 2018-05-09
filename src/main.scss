@@ -89,7 +89,7 @@ $base-line-height: 2em;
 }
 
 .sv_main {
-  background-color: $body-container-background-color;
+   //background-color: $body-container-background-color;
 
   hr {
     border-bottom: 1px solid $border-color;
@@ -132,7 +132,7 @@ $base-line-height: 2em;
   }
 
   .sv_custom_header {
-    background-color: $header-background-color;
+    // background-color: $header-background-color;
   }
 
   .sv_container {

@@ -38,17 +38,17 @@ function init() {
         ]}
     ]};
 
-    Survey.defaultBootstrapCss.navigationButton = "btn btn-primary";
-    Survey.Survey.cssType = "bootstrapmaterial";
-    //Survey.Survey.cssType = "bootstrap";
+     FormBuild.defaultBootstrapCss.navigationButton = "btn btn-primary";
+    // FormBuild.FormBuild.cssType = "bootstrapmaterial";
+   // FormBuild.FormBuild.cssType = "bootstrap";
 
-    var model = new Survey.Model(json);
-    window.survey = model;
+    var model = new FormBuild.Model(json);
+    window.FormBuild = model;
 
     var app = new Vue({
-        el: '#surveyElement',
+        el: '#formBuildWrapper',
         data: {
-            survey: model
+            formBuild: model
         }
     });
 

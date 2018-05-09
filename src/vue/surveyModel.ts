@@ -78,6 +78,7 @@ export class VueSurveyWindowModel extends SurveyWindowModel {
     super(jsonObj, initialModel);
   }
   protected createSurvey(jsonObj: any): SurveyModel {
+    console.log('---help---')
     return new VueSurveyModel(jsonObj);
   }
 }

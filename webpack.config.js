@@ -94,8 +94,7 @@ var platformOptions = {
 
 module.exports = function(options) {
   //TODO
-  options.platformPrefix =
-    options.platform == "knockout" ? "ko" : options.platform;
+  options.platformPrefix = options.platform;
   var packagePath = "./packages/formbuild-" + options.platform + "/";
   var extractCSS = new ExtractTextPlugin({
     filename: packagePath + "formbuild.css"
@@ -278,7 +277,7 @@ module.exports = function(options) {
   }
 
   config.entry[
-    "formbuild." + (options.platform == "knockout" ? "ko" : options.platform)
+    "formbuild." + options.platform
   ] = path.resolve(__dirname, "./src/entries/" + options.platform);
 
   return config;
